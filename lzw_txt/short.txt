@@ -1,0 +1,2 @@
+The fox jumps over the lazy dog. Simple test for compression.
+Line two adds a bit more data.

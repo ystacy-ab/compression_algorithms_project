@@ -1,0 +1,9 @@
+In a distant land, beyond the mountains, lived a wise old owl. 
+Each night, the owl would perch on the tallest tree and watch the world.
+People said it knew the secrets of the stars, the trees, and even the wind. 
+Some travelers claimed to hear it whisper to the moon. 
+Others feared its silence more than a storm. 
+Knowledge, it seemed, had a price. 
+But those who listened carefully learned not about the world, but themselves.
+This is a medium length text meant to test how compression behaves on repeated patterns and natural language content.
+We repeat that this is a medium length text meant to test how compression behaves on repeated patterns and natural language content.
