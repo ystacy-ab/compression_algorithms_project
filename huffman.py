@@ -1,4 +1,4 @@
-"""huff"""
+"""hfn"""
 import os
 import pickle
 
@@ -48,7 +48,6 @@ def build_huffman_tree(freq):
 
     return lst[0] if lst else None
 
-
 def build_codes(root):
     """_summary_
 
@@ -70,7 +69,6 @@ def build_codes(root):
                 stack.append((node.right, curr + "1"))
     return codes
 
-
 def compress_file(filepath):
     """_summary_
 
@@ -80,19 +78,20 @@ def compress_file(filepath):
     Returns:
         _type_: _description_
     """
-    with open(filepath, "r", encoding="utf-8") as f:
-        text = f.read()
+    with open(filepath, "rb") as f:
+        data = f.read()
 
-    codes = build_codes(build_huffman_tree(build_frequency_dict(text)))
+    freq_dict = build_frequency_dict(data)
+    tree = build_huffman_tree(freq_dict)
+    codes = build_codes(tree)
 
-    encoded_text = ''.join(codes[char] for char in text)
-    padded_text = encoded_text + '0' * ((8 - len(encoded_text) % 8) % 8)
-    b = bytearray(int(padded_text[i:i+8], 2) for i in range(0, len(padded_text), 8))
+    encoded_bits = ''.join(codes[byte] for byte in data)
+    padded_bits = encoded_bits + '0' * ((8 - len(encoded_bits) % 8) % 8)
+    byte_array = bytearray(int(padded_bits[i:i+8], 2) for i in range(0, len(padded_bits), 8))
 
     output_path = os.path.splitext(filepath)[0] + ".huff"
     with open(output_path, "wb") as out:
-        pickle.dump((b, codes, len(encoded_text)), out)
-
+        pickle.dump((byte_array, codes, len(encoded_bits)), out)
     return output_path
 
 def decompress_file(filepath):
@@ -105,24 +104,19 @@ def decompress_file(filepath):
         _type_: _description_
     """
     with open(filepath, "rb") as f:
-        b, codes, enc_len = pickle.load(f)
-
-    rev = {}
-    for k, v in codes.items():
-        rev[v] = k
-    bitstr = ''.join(f"{byte:08b}" for byte in b)
-    bitstr = bitstr[:enc_len]
-
+        byte_array, codes, bit_length = pickle.load(f)
+    reversed_codes = {v: k for k, v in codes.items()}
+    bit_string = ''.join(f"{byte:08b}" for byte in byte_array)
+    bit_string = bit_string[:bit_length]
     curr = ""
-    result = ""
-    for bit in bitstr:
+    result = bytearray()
+    for bit in bit_string:
         curr += bit
-        if curr in rev:
-            result += rev[curr]
+        if curr in reversed_codes:
+            result.append(reversed_codes[curr])
             curr = ""
-
-    output_path = os.path.splitext(filepath)[0] + "_decompressed.txt"
-    with open(output_path, "w", encoding="utf-8") as out:
+    output_path = os.path.splitext(filepath)[0] + "_decompressed.wav"
+    with open(output_path, "wb") as out:
         out.write(result)
 
     return output_path
